@@ -12,26 +12,57 @@
          .btn { width: 70px; height: 70px; background: #4CAF50; color: white; border: none; border-radius: 50%; font-size: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px #2e7d32; -webkit-tap-highlight-color: transparent; } 
          .btn:active { transform: translateY(2px); box-shadow: 0 2px #2e7d32; background: #66bb6a; } 
          .up { grid-column: 2; } .left { grid-column: 1; grid-row: 2; } .down { grid-column: 2; grid-row: 2; } .right { grid-column: 3; grid-row: 2; } 
+         #music-btn { margin-top: 15px; padding: 5px 15px; background: #333; color: #4CAF50; border: 1px solid #4CAF50; border-radius: 20px; cursor: pointer; font-size: 14px; } 
      </style> 
  </head> 
  <body> 
      <div id="ui">得分: <span id="score">0</span> / 10</div> 
      <canvas id="game"></canvas> 
      <div id="controls"> 
-         <button class="btn up" onclick="changeDir('up')">↑</button> 
-         <button class="btn left" onclick="changeDir('left')">←</button> 
-         <button class="btn down" onclick="changeDir('down')">↓</button> 
-         <button class="btn right" onclick="changeDir('right')">→</button> 
+         <button class="btn up" onclick="handleInput('up')">↑</button> 
+         <button class="btn left" onclick="handleInput('left')">←</button> 
+         <button class="btn down" onclick="handleInput('down')">↓</button> 
+         <button class="btn right" onclick="handleInput('right')">→</button> 
      </div> 
+     <button id="music-btn" onclick="toggleMusic()">🎵 音乐: 关</button> 
+ 
+     <audio id="bgm" loop> 
+         <source src="法老,杨秋儒 - 我想part2.mp3" type="audio/mpeg"> 
+     </audio> 
  
      <script> 
          const canvas = document.getElementById('game'); 
          const ctx = canvas.getContext('2d'); 
          const scoreEl = document.getElementById('score'); 
+         const bgm = document.getElementById('bgm'); 
+         const musicBtn = document.getElementById('music-btn'); 
          const gridSize = 20; const tileCount = 15; 
          canvas.width = canvas.height = gridSize * tileCount; 
  
          let snake, food, dx, dy, score, gameActive; 
+         let musicPlaying = false; 
+ 
+         function toggleMusic() { 
+             if (musicPlaying) { 
+                 bgm.pause(); 
+                 musicBtn.innerText = "🎵 音乐: 关"; 
+             } else { 
+                 bgm.play().catch(e => console.log("请先点击页面以播放音频")); 
+                 musicBtn.innerText = "🎵 音乐: 开"; 
+             } 
+             musicPlaying = !musicPlaying; 
+         } 
+ 
+         function handleInput(dir) { 
+             // 浏览器策略：第一次点击任何按钮时尝试开启音乐 
+             if (!musicPlaying) { 
+                 bgm.play().then(() => { 
+                     musicPlaying = true; 
+                     musicBtn.innerText = "🎵 音乐: 开"; 
+                 }).catch(() => {}); 
+             } 
+             changeDir(dir); 
+         } 
  
          function resetGame() { 
              snake = [{x: 7, y: 7}, {x: 7, y: 8}]; 
